@@ -1351,6 +1351,7 @@ target_sources_grouped(
     FILES
     neo/bot/neo_bot.cpp
     neo/bot/neo_bot.h
+    neo/bot/neo_bot_commands.cpp
 )
 
 target_sources_grouped(

@@ -17,33 +17,27 @@
 #include "in_buttons.h"
 #include "movehelper_server.h"
 
-#include "neo_player.h"
+#include "neo_bot.h"
 
-void ClientPutInServer( edict_t *pEdict, const char *playername );
-
-void Bot_Think(CNEO_Player* pBot);
-
-#if defined(DEBUG) || defined(NEO)
-
-ConVar bot_forcefireweapon( "bot_forcefireweapon", "", 0, "Force bots with the specified weapon to fire." );
-ConVar bot_forceattack2( "bot_forceattack2", "0", 0, "When firing, use attack2." );
-ConVar bot_forceattackon( "bot_forceattackon", "0", 0, "When firing, don't tap fire, hold it down." );
-ConVar bot_flipout( "bot_flipout", "0", 0, "When on, all bots fire their guns." );
-ConVar bot_defend( "bot_defend", "0", 0, "Set to a team number, and that team will all keep their combat shields raised." );
-ConVar bot_changeclass( "bot_changeclass", "0", 0, "Force all bots to change to the specified class." );
-ConVar bot_zombie( "bot_zombie", "0", 0, "Brraaaaaiiiins." );
-static ConVar bot_mimic_yaw_offset( "bot_mimic_yaw_offset", "0", 0, "Offsets the bot yaw." );
-ConVar bot_attack( "bot_attack", "1", 0, "Shoot!" );
-
-ConVar bot_sendcmd( "bot_sendcmd", "", 0, "Forces bots to send the specified command." );
-
-ConVar bot_crouch( "bot_crouch", "0", 0, "Bot crouches" );
+ConVar bot_forcefireweapon("bot_forcefireweapon", "", 0, "Force bots with the specified weapon to fire.");
+ConVar bot_forceattack2("bot_forceattack2", "0", 0, "When firing, use attack2.");
+ConVar bot_forceattackon("bot_forceattackon", "0", 0, "When firing, don't tap fire, hold it down.");
+ConVar bot_flipout("bot_flipout", "0", 0, "When on, all bots fire their guns.");
+ConVar bot_defend("bot_defend", "0", 0, "Set to a team number, and that team will all keep their combat shields raised.");
+ConVar bot_changeclass("bot_changeclass", "0", 0, "Force all bots to change to the specified class.");
+ConVar bot_zombie("bot_zombie", "0", 0, "Brraaaaaiiiins.");
+static ConVar bot_mimic_yaw_offset("bot_mimic_yaw_offset", "0", 0, "Offsets the bot yaw.");
+ConVar bot_attack("bot_attack", "1", 0, "Shoot!");
+ConVar bot_sendcmd("bot_sendcmd", "", 0, "Forces bots to send the specified command.");
+ConVar bot_crouch("bot_crouch", "0", 0, "Bot crouches");
 
 #ifdef NEXT_BOT
 extern ConVar bot_mimic;
 #else
-ConVar bot_mimic( "bot_mimic", "0", 0, "Bot uses usercmd of player by index." );
+ConVar bot_mimic("bot_mimic", "0", 0, "Bot uses usercmd of player by index.");
 #endif
+
+ConVar sv_bot_test_pattern("sv_bot_test_pattern", "1", 0, "Bot test pattern", true, 0.0, true, 1.0);
 
 static int BotNumber = 1;
 static int g_iNextBotTeam = -1;
@@ -93,11 +87,7 @@ CBasePlayer *BotPutInServer( bool bFrozen, int iTeam )
 
 	// Allocate a CBasePlayer for the bot, and call spawn
 	//ClientPutInServer( pEdict, botname );
-#ifdef NEO
 	CNEO_Player* pPlayer = static_cast<CNEO_Player*>(CBaseEntity::Instance(pEdict));
-#else
-	auto pPlayer = ((CHL2MP_Player*)CBaseEntity::Instance(pEdict));
-#endif
 	Assert(pPlayer);
 	pPlayer->ClearFlags();
 	pPlayer->AddFlag( FL_CLIENT | FL_FAKECLIENT );
@@ -121,11 +111,7 @@ void Bot_RunAll( void )
 {
 	for ( int i = 1; i <= gpGlobals->maxClients; ++i )
 	{
-#ifdef NEO
 		auto pPlayer = ToNEOPlayer(UTIL_PlayerByIndex(i));
-#else
-		CHL2MP_Player *pPlayer = ToHL2MPPlayer( UTIL_PlayerByIndex( i ) );
-#endif
 
 		if ( pPlayer && (pPlayer->GetFlags() & FL_FAKECLIENT) )
 		{
@@ -169,11 +155,7 @@ bool RunMimicCommand( CUserCmd& cmd )
 // Output : 	virtual void
 //-----------------------------------------------------------------------------
 static void RunPlayerMove(
-#ifdef NEO
 	CNEO_Player *fakeclient,
-#else
-	CHL2MP_Player* fakeclient,
-#endif
 	const QAngle& viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, float frametime )
 {
 	if ( !fakeclient )
@@ -221,18 +203,12 @@ static void RunPlayerMove(
 	gpGlobals->curtime = flOldCurtime;
 }
 
-#ifdef NEO
-ConVar sv_bot_test_pattern("sv_bot_test_pattern", "1", 0, "Bot test pattern", true, 0.0, true, 1.0);
-#endif
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Run this Bot's AI for one frame.
 //-----------------------------------------------------------------------------
-#ifdef NEO
 void Bot_Think(CNEO_Player* pBot)
-#else
-void Bot_Think(CHL2MP_Player* pBot)
-#endif
 {
 	// Make sure we stay being a bot
 	pBot->AddFlag( FL_FAKECLIENT );
@@ -458,9 +434,3 @@ void Bot_Think(CHL2MP_Player* pBot)
 
 	RunPlayerMove( pBot, pBot->GetLocalAngles(), forwardmove, sidemove, upmove, buttons, impulse, frametime );
 }
-
-
-
-
-#endif
-
