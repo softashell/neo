@@ -14,17 +14,16 @@
 
 #include "cbase.h"
 #include "player.h"
-#include "hl2mp_player.h"
 #include "in_buttons.h"
 #include "movehelper_server.h"
 
+#include "neo_player.h"
+
 void ClientPutInServer( edict_t *pEdict, const char *playername );
 
-#ifndef NEO
-void Bot_Think(CHL2MP_Player* pBot);
-#endif
+void Bot_Think(CNEO_Player* pBot);
 
-#if defined(DEBUG) && !defined(NEO)
+#if defined(DEBUG) || defined(NEO)
 
 ConVar bot_forcefireweapon( "bot_forcefireweapon", "", 0, "Force bots with the specified weapon to fire." );
 ConVar bot_forceattack2( "bot_forceattack2", "0", 0, "When firing, use attack2." );

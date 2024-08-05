@@ -1347,6 +1347,14 @@ target_sources_grouped(
 
 target_sources_grouped(
     TARGET server
+    NAME "NEO\\BOTS"
+    FILES
+    neo/bot/neo_bot.cpp
+    neo/bot/neo_bot.h
+)
+
+target_sources_grouped(
+    TARGET server
     NAME "NEO\\Weapons"
     FILES
     ${CMAKE_SOURCE_DIR}/game/shared/neo/weapons/weapon_aa13.cpp
